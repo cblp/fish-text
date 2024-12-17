@@ -22,20 +22,20 @@ import Control.Lens ((.~), (^.))
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
 import Data.Function ((&))
+import Data.String
 import Data.Text as T
 import GHC.Generics (Generic)
 import Network.Wreq (defaults, getWith, param, responseBody)
 import Telegram.Bot.API qualified as Api
 
-sendMessage :: Api.SomeChatId -> Text -> IO (Api.Response Api.Message)
-sendMessage chatId html =
-  runTelegramClient $
-    Api.sendMessage (Api.defSendMessage chatId html)
-
 makePost :: Text -> IO ()
 makePost txt = do
-  chId <- getEnv "TELEGRAM_BOT_CHANNEL_ID"
-  void $ sendMessage (Api.SomeChatId (Api.ChatId (read chId))) txt
+  chId <- Api.SomeChatId . Api.ChatId . read <$> getEnv "TELEGRAM_BOT_CHANNEL_ID"
+  token <- fromString <$> getEnv "TELEGRAM_BOT_TOKEN"
+  void $
+    runTelegramClient token $
+      Api.sendMessage $
+        Api.defSendMessage chId txt
 
 newtype FishTextResponse = FishTextResponse {text :: Text}
   deriving anyclass (FromJSON)
@@ -45,13 +45,13 @@ getPostText :: IO Text
 getPostText = do
   resp <-
     getWith
-      (defaults & param "number" .~ [T.pack "1"])
+      (defaults & param "number" .~ ["1"])
       "http://fish-text.ru/get"
   obj <-
     Aeson.throwDecode $
       resp ^. responseBody
 
-  pure $ obj & text
+  pure $ text obj
 
 main :: IO ()
 main = do
@@ -61,10 +61,9 @@ main = do
     makePost txt
     threadDelay 300000000
 
-runTelegramClient :: ClientM a -> IO a
-runTelegramClient action = do
+runTelegramClient :: Api.Token -> ClientM a -> IO a
+runTelegramClient token action = do
   httpManager <- newTlsManagerWith tlsManagerSettings
-  token <- getEnv "TELEGRAM_BOT_TOKEN"
-  let clientEnv = mkClientEnv httpManager $ Api.botBaseUrl (Api.Token $ T.pack token)
+  let clientEnv = mkClientEnv httpManager $ Api.botBaseUrl token
   eResult <- runClientM action clientEnv
   either throwIO pure eResult
