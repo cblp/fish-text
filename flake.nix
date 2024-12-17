@@ -6,8 +6,8 @@
 	outputs = { nixpkgs, flake-parts, ... }@inputs: flake-parts.lib.mkFlake { inherit inputs; } {
 		systems = nixpkgs.lib.platforms.unix;
 		perSystem = { pkgs, ... }: {
-			packages.default = pkgs.haskellPackages.developPackage { root = ./.; };
-			devShells.default = pkgs.haskellPackages.developPackage { root = ./.; returnShellEnv = true; };
+			packages.default = import ./nix/package.nix { inherit pkgs; };
+			devShells.default =  import ./nix/package.nix { inherit pkgs; isShell = true; };
 		};
 	};
 }
