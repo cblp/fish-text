@@ -1,18 +1,29 @@
-cabal-version:      3.0
-name:               fish-text
-version:            1.0.0
-license:            GPL-3.0-only
-license-file:       LICENSE
-author:             ProggerX
-maintainer:         x@proggers.ru
-build-type:         Simple
+cabal-version: 3.0
+name:          fish-text
+version:       1.0.0
+license:       GPL-3.0-only
+license-file:  LICENSE
+author:        ProggerX
+maintainer:    x@proggers.ru
+build-type:    Simple
 
 common warnings
-    ghc-options: -Wall
+  ghc-options: -Wall
 
 executable fish-text
-    import:           warnings
-    main-is:          Main.hs
-    build-depends:    base >=4.18.2.1, telegram-bot-api, servant-client, http-client-tls, dotenv, text, wreq, lens, aeson
-    hs-source-dirs:   app
-    default-language: GHC2021
+  import:           warnings
+  main-is:          Main.hs
+  build-depends:
+    , aeson
+    , base              >=4.18.2.1
+    , dotenv
+    , http-client-tls
+    , lens
+    , o-clock
+    , servant-client
+    , telegram-bot-api
+    , text
+    , wreq
+
+  hs-source-dirs:   app
+  default-language: GHC2021
