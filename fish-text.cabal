@@ -13,6 +13,6 @@ common warnings
 executable fish-text
     import:           warnings
     main-is:          Main.hs
-    build-depends:    base ^>=4.18.2.1, telegram-bot-api, servant-client, http-client-tls, dotenv, text, wreq, lens, bytestring, aeson
+    build-depends:    base >=4.18.2.1, telegram-bot-api, servant-client, http-client-tls, dotenv, text, wreq, lens, aeson
     hs-source-dirs:   app
     default-language: GHC2021
